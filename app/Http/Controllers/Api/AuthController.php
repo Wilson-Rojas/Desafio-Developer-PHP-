@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
@@ -59,5 +61,12 @@ class AuthController extends Controller
         }
 
         return response()->json(['user' => $user,'token' => auth()->user()->createToken('api-token')->plainTextToken]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Sesión cerrada correctamente.']);
     }
 }

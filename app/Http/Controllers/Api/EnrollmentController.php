@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use Illuminate\Validation\ValidationException;
+use DB;
 
 class EnrollmentController extends Controller
 {
@@ -22,7 +23,19 @@ class EnrollmentController extends Controller
             }
 
             if ($request->has('course_id')) {
-                $enrollments = Enrollment::with('student')->where('course_id', $request->course_id)->get();
+                $courseId = $request->input('course_id');
+                $enrollments = DB::table('enrollments')
+                    ->join('students', 'enrollments.student_id', '=', 'students.id')
+                    ->join('courses', 'enrollments.course_id', '=', 'courses.id')
+                    ->where('enrollments.course_id', $courseId)
+                    ->select(
+                        'courses.title as course_title',
+                        'students.id as student_id',
+                        'students.name as student_name',
+                        'students.email as student_email',
+                    )
+                    ->orderBy('students.name')
+                    ->get();
                 return response()->json([
                     'message' => 'Inscripciones encontradas correctamente.',
                     'code' => 200,
@@ -73,6 +86,24 @@ class EnrollmentController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function noinscrip($courseId)
+    {
+        $students = DB::table('students')
+            ->whereNotExists(function ($query) use ($courseId) {
+                $query->select(DB::raw(1))
+                    ->from('enrollments')
+                    ->whereColumn('enrollments.student_id', 'students.id')
+                    ->where('enrollments.course_id', $courseId);
+            })
+            ->select(
+                'id as student_id',
+                'name as student_name',
+            )
+            ->orderBy('name')
+            ->get();
+        
+        return $students;
     }
 
     public function destroy($id)

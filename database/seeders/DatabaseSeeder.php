@@ -76,5 +76,21 @@ class DatabaseSeeder extends Seeder
             }
         }
         DB::table('enrollments')->insert($enrollments);
+
+        $courseStudent = [];
+        foreach ($studentIds as $studentId) {
+            $randomCourseCount = $faker->numberBetween(2, 6);
+            $randomCourseIds = $faker->randomElements($courseIds, $randomCourseCount);
+            
+            foreach ($randomCourseIds as $courseId) {
+                $courseStudent[] = [
+                    'student_id' => $studentId,
+                    'course_id' => $courseId,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ];
+            }
+        }
+        DB::table('course_student')->insert($courseStudent);
     }
 }

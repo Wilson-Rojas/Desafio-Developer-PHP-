@@ -15,9 +15,4 @@ class Student extends Model
         'birthdate',
         'nationality',
     ];
-
-    public function courses()
-    {
-        return $this->belongsToMany(Course::class, 'enrollments')->withTimestamps();
-    }
 }

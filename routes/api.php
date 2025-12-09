@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\EnrollmentController;
+use App\Http\Controllers\Api\StudentCourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
 
 // Rutas de estudiantes
@@ -53,5 +55,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('enrollments', [EnrollmentController::class, 'store']);//inscripcion 
     Route::get('enrollments', [EnrollmentController::class, 'index']);
+    Route::get('noenrollments/{course_id}', [EnrollmentController::class, 'noinscrip']);
     Route::delete('enrollments/{id}', [EnrollmentController::class, 'destroy']);
 });
